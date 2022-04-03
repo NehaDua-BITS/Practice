@@ -39,6 +39,11 @@ public class TreeNode {
             printInorder(root.right);
         }
     }
+
+    @Override
+    public String toString() {
+        return String.valueOf(val);
+    }
 }
 
 
