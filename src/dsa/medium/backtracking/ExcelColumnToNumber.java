@@ -1,10 +1,10 @@
 package dsa.medium.backtracking;
 
-public class ExcelColumn {
+public class ExcelColumnToNumber {
 
     public static void main(String[] args) {
-        ExcelColumn obj = new ExcelColumn();
-        String title = "ZY";
+        ExcelColumnToNumber obj = new ExcelColumnToNumber();
+        String title = "AZ";
         System.out.println("Title to number = " + obj.titleToNumber(title));
     }
 
