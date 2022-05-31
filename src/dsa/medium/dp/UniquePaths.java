@@ -10,40 +10,6 @@ public class UniquePaths {
         System.out.println("Number of unique paths = " + new UniquePaths().uniquePathsOptimised(m,n));
     }
 
-//    private int uniquePaths(int m, int n) {
-//        boolean visited[][] = new boolean[m][n];
-//        visited[0][0] = true;
-//        return uniquePathsUtil(m, n, 0, 0, visited);
-//    }
-
-//    private int uniquePathsUtil(int rows, int cols, int r, int c, boolean[][] visited) {
-//        int[] row = {0, 1};
-//        int[] col = {1, 0};
-//
-//        if (r == rows-1 && c == cols-1) {
-//            visited[r][c] = false;
-//            return 1;
-//        }
-//
-//        int count = 0;
-//        for (int i = 0; i < 2; i++) {
-//            if (isValid(r + row[i], c + col[i], rows, cols, visited)) {
-//                visited[r][c] = true;
-//                count += uniquePathsUtil(rows, cols, r + row[i], c + col[i], visited);
-//                visited[r][c] = false;
-//            }
-//        }
-//
-//        return count;
-//    }
-//
-//    private boolean isValid(int r, int c, int rows, int cols, boolean[][] visited) {
-//        return (r >= 0 && r < rows)
-//                && (c >= 0 && c < cols)
-//                && !visited[r][c];
-//    }
-
-
     private int uniquePathsOptimised(int m, int n) {
         int pathsCount[][] = new int[m][n];
         for (int i = 0; i < m; i++) {
@@ -81,5 +47,40 @@ public class UniquePaths {
         return (r >= 0 && r < rows)
                 && (c >= 0 && c < cols);
     }
+
+    //    private int uniquePaths(int m, int n) {
+//        boolean visited[][] = new boolean[m][n];
+//        visited[0][0] = true;
+//        return uniquePathsUtil(m, n, 0, 0, visited);
+//    }
+
+//    private int uniquePathsUtil(int rows, int cols, int r, int c, boolean[][] visited) {
+//        int[] row = {0, 1};
+//        int[] col = {1, 0};
+//
+//        if (r == rows-1 && c == cols-1) {
+//            visited[r][c] = false;
+//            return 1;
+//        }
+//
+//        int count = 0;
+//        for (int i = 0; i < 2; i++) {
+//            if (isValid(r + row[i], c + col[i], rows, cols, visited)) {
+//                visited[r][c] = true;
+//                count += uniquePathsUtil(rows, cols, r + row[i], c + col[i], visited);
+//                visited[r][c] = false;
+//            }
+//        }
+//
+//        return count;
+//    }
+//
+//    private boolean isValid(int r, int c, int rows, int cols, boolean[][] visited) {
+//        return (r >= 0 && r < rows)
+//                && (c >= 0 && c < cols)
+//                && !visited[r][c];
+//    }
+
+
 
 }

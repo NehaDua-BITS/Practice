@@ -19,15 +19,7 @@ public class Permutations {
         if (nums == null || nums.length == 0) {
             return list;
         }
-
-        int length = nums.length;
-        for (int i = 0; i < length; i++) {
-            List<Integer> subList = new ArrayList<>();
-            subList.add(nums[i]);
-            boolean[] visited = new boolean[length];
-            visited[i] = true;
-            permute(nums, list, subList, visited);
-        }
+        permute(nums, list, new ArrayList<>(), new boolean[nums.length]);
         return list;
     }
 

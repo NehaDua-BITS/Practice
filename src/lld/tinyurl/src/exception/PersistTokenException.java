@@ -1,4 +1,4 @@
-package lld.tinyurl.exception;
+package lld.tinyurl.src.exception;
 
 public class PersistTokenException extends TinyUrlException {
 

@@ -1,78 +1,49 @@
 package lld.ratelimiter.service.impl;
 
+import lld.ratelimiter.algorithms.TokenBucket;
+import lld.ratelimiter.models.Quota;
 import lld.ratelimiter.models.Request;
-import lld.ratelimiter.service.RateLimiter;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lld.ratelimiter.service.QuotaService;
+import lld.ratelimiter.service.RateLimiterService;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.logging.Logger;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
-public class TokenBucketRateLimiter implements RateLimiter {
+public class TokenBucketRateLimiter implements RateLimiterService {
 
-    private Logger logger = Logger.getLogger(TokenBucketRateLimiter.class.getName());
+    private Map<String, TokenBucket> userBucketMap;
 
-    private int maxTokens; //max bucket capacity
-
-    private int tokenRefreshRate; //token refresh interval
-
-    private Map<String, UserTokenInfo> userTokenInfoMap;
-
-    private Object lock;
-
-    public TokenBucketRateLimiter(int maxTokens, int tokenRefreshRate) {
-        this.maxTokens = maxTokens;
-        this.tokenRefreshRate = tokenRefreshRate;
-        userTokenInfoMap = new ConcurrentHashMap<>();
-        lock = new Object();
+    public TokenBucketRateLimiter() {
+        this.userBucketMap = new ConcurrentHashMap<>();
+        //scheduleDeletion();
     }
 
     @Override
-    public boolean isAllowed(Request request) {
-        synchronized (this.lock) {
-            boolean isAllowed = false;
-            long currentTime = System.currentTimeMillis();
-            UserTokenInfo userTokenInfo = userTokenInfoMap.get(request.getUserId());
-            if (userTokenInfo == null) {
-                userTokenInfoMap.put(request.getUserId(), new UserTokenInfo(maxTokens - 1, currentTime));
-                isAllowed = true;
-            } else {
-                refreshTokens(userTokenInfo, currentTime);
-                if (userTokenInfo.getAvailTokens().get() > 0) {
-                    userTokenInfo.getAvailTokens().decrementAndGet();
-                    isAllowed = true;
-                }
-            }
-
-            logger.info(String.format("Request %s : %s", isAllowed ? "Accepted" : "Rejected", request));
-            return isAllowed;
-        }
+    public synchronized boolean isAllowed(Request request) {
+        String userId = request.getUserId();
+        TokenBucket userBucket = userBucketMap.computeIfAbsent(userId, id -> {
+            System.out.println("Bucket created for user :" + userId);
+            Quota userQuota = QuotaService.getUserQuota(userId);
+            return new TokenBucket(userQuota.getMaxTokens(), userQuota.getTokenRefreshRate());
+        });
+        boolean isAllowed = userBucket.isAllowed();
+        System.out.println(String.format("Request %s => %s", isAllowed ? "Accepted" : "Rejected", request));
+        return isAllowed;
     }
 
-    private void refreshTokens(UserTokenInfo userTokenInfo, long currentTime) {
-        int additionalTokens = (int) (((currentTime - userTokenInfo.getLastTokenRefreshTime().get()) / 1000) * tokenRefreshRate);
-        int newTokens = Math.min(userTokenInfo.getAvailTokens().get() + additionalTokens, maxTokens);
-        userTokenInfo.getAvailTokens().getAndSet(newTokens);
-        userTokenInfo.getLastTokenRefreshTime().getAndSet(currentTime);
-    }
-
+//    private void scheduleDeletion() {
+//        ScheduledExecutorService scheduledExecutorService = new ScheduledThreadPoolExecutor(5);
+//        scheduledExecutorService.scheduleAtFixedRate(() -> {
+//            long thresholdTime = 2000;
+//            for (Map.Entry<String, TokenBucket> entry : userBucketMap.entrySet()) {
+//                if (System.currentTimeMillis() - entry.getValue().getLastTokenRefreshTime() >= thresholdTime) {
+//                    userBucketMap.remove(entry.getKey());
+//                }
+//            }
+//        }, 3, 1, TimeUnit.SECONDS);
+//    }
 }
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-class UserTokenInfo {
-    private AtomicInteger availTokens;
-    private AtomicLong lastTokenRefreshTime;
-
-    public UserTokenInfo(int availTokens, long lastTokenRefreshTime) {
-        this.availTokens = new AtomicInteger(availTokens);
-        this.lastTokenRefreshTime = new AtomicLong(lastTokenRefreshTime);
-    }
-}

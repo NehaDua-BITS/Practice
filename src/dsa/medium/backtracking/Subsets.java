@@ -21,7 +21,7 @@ public class Subsets {
     private List<List<Integer>> subsets(int[] nums) {
         List<List<Integer>> result = new ArrayList<>();
         if (nums != null && nums.length > 0) {
-            result.add(new ArrayList<>());
+            result.add(new ArrayList<>()); //add empty subset
             List<Integer> subset = new ArrayList<>();
             for (int i = 0; i < nums.length; i++) {
                 subset.add(nums[i]);

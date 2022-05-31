@@ -1,8 +1,8 @@
-package lld.tinyurl.src;
+package lld.tinyurl.src.service;
 
-import lld.tinyurl.exception.NoTokenFound;
-import lld.tinyurl.exception.PersistTokenException;
-import lld.tinyurl.exception.ReadTokenException;
+import lld.tinyurl.src.exception.NoTokenFound;
+import lld.tinyurl.src.exception.PersistTokenException;
+import lld.tinyurl.src.exception.ReadTokenException;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
